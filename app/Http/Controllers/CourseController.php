@@ -22,20 +22,15 @@ class CourseController extends Controller
 
         // creating chunks of data
         $chunks = array_chunk($data, 100);
-        $tmppath = resource_path('temp');
+        // $tmppath = resource_path('temp');
 
-        foreach ($chunks as $key => $file) {
-            $filename = "/tmp{$key}.csv";
-            file_put_contents($tmppath . $filename, $file);
-        }
-
-        $files = glob("$tmppath/*.csv");
-        $header = [];
+        // foreach ($chunks as $key => $file) {
+        //     $filename = "/tmp{$key}.csv";
+        //     file_put_contents($tmppath . $filename, $file);
+        // }
         $msg = "** ";
-        $count = 0;
-
-        foreach ($files as $key => $file) {
-            $data = array_map('str_getcsv', file($file));
+        foreach ($chunks as $key => $file) {
+            $data = array_map('str_getcsv', $file);
             if ($key === 0) {
                 $header = $data[0];
                 unset($data[0]);
@@ -45,13 +40,13 @@ class CourseController extends Controller
                     $msg .= "File does not contain 'course_name' field";
                 } elseif (!in_array('course_code', $header)) {
                     $msg .= "File does not contain 'course_code' field";
-                } elseif ($msg != "** ") {
+                }
+                if ($msg != "** ") {
                     return view('upload-file', ['message' => $msg]);
                 }
             }
             UploadCSVfile::dispatch($data, $header);
-            unlink($file);
         }
-        return view('upload-file', ['message' => "** Data Saved!"]);
+        return view('upload-file', ['message' => "** Data is being Saved!"]);
     }
 }
